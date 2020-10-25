@@ -1,5 +1,19 @@
-<h4>Detalhes: {{transaction.description}}</h4>
-<h4>Saldo: {{transaction.balance}}</h4>
-<h4>Débito: {{transaction.debit}}</h4>
-<h4>Crédito: {{transaction.credit}}</h4>
-<h4>Estado: {{transaction.status}}</h4>
+<!DOCTYPE html>
+<html>
+    <header>
+        <title>Credit and Debit API</title>
+        <p>Usuário: {{request.user}}</p>
+    </header>
+    <body>
+        <ul>
+            <li><h4>Detalhes: {{transaction.description}}</h4></li>
+            <li><h4>Saldo: {{transaction.balance}}</h4></li>
+            <li><h4>Débito: {{transaction.debit}}</h4></li>
+            <li><h4>Crédito: {{transaction.credit}}</h4></li>
+            <li><h4>Estado: {{transaction.status}}</h4></li>
+        </ul>        
+    </body>
+    <footer>
+        <h5>Nix Bank</h5>
+    </footer>
+</html>

@@ -14,10 +14,13 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
-from credit_debit_api import views
+from django.urls import path, include
+from credit_debit_api.views import transaction_detail
+from credit_debit_api.rest import urls
+from rest_framework import routers
 
 urlpatterns = [
-    path('<int:pk>/', views.transaction_detail, name='description'),
+    path('',include(urls)),
+    path('<int:pk>/', transaction_detail, name='description'),
     path('admin/', admin.site.urls),
 ]
