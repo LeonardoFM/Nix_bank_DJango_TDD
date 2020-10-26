@@ -44,8 +44,10 @@ def transaction_detail_by_day(request, date):
     return Response(data=data,status=status.HTTP_200_OK)
 
 @api_view(['POST'])
-def transaction_debit(request, value):
-    account_id = int(dict(request.query_params)['account_id'][0])
+def transaction_debit(request, value, account_id=0):    
+    if account_id == 0:
+        account_id = int(dict(request.query_params)['account_id'][0])
+
     transaction = Transaction.objects.last()
     balance = transaction.balance - value
     
@@ -67,8 +69,10 @@ def transaction_debit(request, value):
     return Response(data={'id':t.id},status=status.HTTP_200_OK)
 
 @api_view(['POST'])
-def transaction_credit(request, value):
-    account_id = int(dict(request.query_params)['account_id'][0])
+def transaction_credit(request, value, account_id=0):
+    if account_id == 0:
+        account_id = int(dict(request.query_params)['account_id'][0])
+        
     transaction = Transaction.objects.last()
     balance = transaction.balance + value
     
@@ -127,23 +131,32 @@ def create_account_detail(request, data):
     return Response(data={'account_id':va.id},status=status.HTTP_200_OK)
 
 @api_view(['GET'])
-def extract(request):
-    agency = request.data['agency']
-    current_account = request.data['current_account']
+def extract(request, data_in={}):
+    if data_in == {}:
+        agency = request.data['agency']
+        current_account = request.data['current_account']
+    else:
+        agency = data_in['agency']
+        current_account = data_in['current_account']
+
+    # import pdb; pdb.set_trace()
     account = VirtualAccount.objects.filter(agency=agency,
         current_account=current_account)
 
-    transactions = Transaction.objects.filter(account=account[0])
-    data = {}
-    for t in transactions:
-        data.update({
-            "date":t.date,
-            "description":t.description,
-            "balance":t.balance,
-            "debit":t.debit,
-            "credit":t.credit,
-            "status":t.status
-        })
+    if account:
+        transactions = Transaction.objects.filter(account=account[0])
+        data = {}
+        for t in transactions:
+            data.update({
+                "date":t.date,
+                "description":t.description,
+                "balance":t.balance,
+                "debit":t.debit,
+                "credit":t.credit,
+                "status":t.status
+            })
+        
+        return Response(data=data,status=status.HTTP_200_OK)
     
-    return Response(data=data,status=status.HTTP_200_OK)
+    return Response(status=status.HTTP_400_BAD_REQUEST)
 
