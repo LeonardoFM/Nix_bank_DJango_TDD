@@ -10,14 +10,13 @@ def account(request, db):
     return mixer.blend('credit_debit_api.VirtualAccount', status=request.param)
 
 @pytest.mark.parametrize('account', [''], indirect=True)
-def test_post_debit_authenticated_by_virtual_account(account):
+def test_post_debit_authenticated_by_virtual_account_id(account):
     # if the user request debit method with own account
     value = 11234
     path = reverse('debit', kwargs={'value':value})
     mixer.blend('credit_debit_api.Transaction')
     factory = RequestFactory()
-    request = factory.get(path)
-    request.method = 'POST'
+    request = factory.post(path)
     post_response = rest.views.transaction_debit(request, value=value, account_id=account.id)
     assert post_response.status_code == 200
     # then the post should have the same account
@@ -34,8 +33,7 @@ def test_post_credit_authenticated_by_virtual_account(account):
     path = reverse('credit', kwargs={'value':value})
     mixer.blend('credit_debit_api.Transaction')
     factory = RequestFactory()
-    request = factory.get(path)
-    request.method = 'POST'
+    request = factory.post(path)
     post_response = rest.views.transaction_credit(
         request, value=value, account_id=account.id)
     assert post_response.status_code == 200

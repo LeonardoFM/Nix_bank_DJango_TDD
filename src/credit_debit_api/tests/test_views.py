@@ -59,8 +59,7 @@ class TestRestViews(TestCase):
 
     def test_post_create_account_detail(self):
         path = reverse('account_create')
-        request = self.factory.get(path)
-        request.method = 'POST'
+        request = self.factory.post(path)
         data = {
             'name':'teste3',
             'agency':'000-3',
@@ -69,7 +68,32 @@ class TestRestViews(TestCase):
         response = rest.views.create_account_detail(request, data)
         assert response.status_code == 200
         
+    def test_get_extract_bad_request(self):
+        path = reverse('extract')
+        request = self.factory.get(path)
+        data = {
+            'agency':'000-1',
+            'current_account': '000-1'
+        }
+        response = rest.views.extract(request, data)
+        assert response.status_code == 400
 
+    def test_get_extract_good_request(self):
+        value = 1234
+        path = reverse('credit', kwargs={'value':value})
+        request = self.factory.get(path)
+        request.method = 'POST'
+        account = mixer.blend('credit_debit_api.VirtualAccount')
+        response = rest.views.transaction_credit(request, value=value, account_id=account.id)
+        assert response.status_code == 200
+        path = reverse('extract')
+        request = self.factory.get(path)
+        data = {
+            'agency':account.agency,
+            'current_account': account.current_account
+        }
+        response = rest.views.extract(request, data)
+        assert response.status_code == 200
 
 
 @pytest.mark.django_db
